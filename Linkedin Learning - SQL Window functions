@@ -1,0 +1,94 @@
+Linkedin Learning - SQL Window functions
+Agenda
+- Introduction
+- Window Functions and the OVER Clause
+- Framing, Exclusions, and Shortcuts
+- Aggregate Window Functions
+- Rank and Distribution Window Functions
+- Offset Window Functions
+- Conclusion
+
+SQL Query logical processing order
+- FROM: where the data set for the query is constructed. 
+ All data sources, join qualifications, and reservations are evaluated and placed into a single data set that is then passed to the WHERE clause. 
+- WHERE: evaluates each row using logical predicates. 
+ Rows for which the predicate evaluates to true will live to see another clause. All others are discarded, never to be seen again by the query. 
+- GROUP BY: GROUP BY changes the fundamental structure of the set, from individual rows into row groups based on the grouping expressions. 
+-HAVING: HAVING uses logical predicates, as well, to evaluate entire row groups. 
+ Only groups for which these predicates evaluate to true, will get to see another clause. The row filtered grouped and grouped filtered set is then passed to the SELECT clause. 
+- SELECT: SELECT evaluate each expression for every row or row group. 
+ These are the expressions that will be returned to the client application. Next, the set is passed to the ORDER BY clause. 
+- ORDER BY: ORDER BY sorts the data set and at this point, it ceases to be a set and becomes a cursor. cursor can be further processed by the query's final clause
+- OFFSET: the OFFSET FETCH, also known as LIMIT OFFSET, where it is sliced into manageable bite-sized pages for user consumption
+
+FROM > Source Data
+WHERE > Row Filter
+GROUP BY > Grouping
+HAVING > Group Filter
+SELECT > Return Expressions
+ORDER BY > Presentation Order
+OFFSET / FETCH > Paging
+
+window functions open a new window to other rows that can be accessed directly without a subquery.
+
+How Window Functions Fit in Query Processing
+Expressions using window functions have access to values from other rows.
+Without window functions, this can only be achieved via subqueries.
+
+Window functions can only be used in SELECT and ORDER BY clauses exclusively, after the query's data set is finalized.
+
+ 
+
+Overview and the Filter Subclause
+The OVER clause defines the window to which the currently evaluated row can access.
+
+Function	(Expressions)
+FILTER	(WHERE Predicates)
+OVER	(
+	[PARTITION BY Expressions]
+	[ORDER BY Expressions [NULLS FIRST|LAST]]
+	[Frame Type BETWEEN Frame Start AND Frame End]
+	[EXCLUDE Frame Exclusion]
+	)
+A blank OVER () clause provides access to the query’s entire data set.
+All the other subclauses within the OVER clause limit the window to only a subset of the query’s data set.
+
+The FILTER clause can eliminate rows from the window using predicates, much like in a WHERE clause, but without changing the query’s data set.
+
+Window functions enable opportunities for the query optimizer to improve performance.
+
+The PARTITION BY clause limits the window to rows that share the same value as the current row. It replaces the correlation term in the equivalent non-windowed subquery to achieve the same goal.
+
+The ORDER BY clause may have different meanings depending on the function used. Some functions are order agnostic by nature, and others, such as ranking functions, depend on it for their evaluation.
+
+** Key Takeaways
+
+Framing Rows and Ranges
+The PARTITION BY clause limits the rows that the current row has access to, and framing further restricts the window to a subset of the rows within the partition.
+
+To define a frame, an ORDER BY is needed to define its boundaries and give meaning to the terms “first”, “last”, “next” etc.
+
+There are three types of frames:
+
+ROWS frames rely on row order based on the ORDER BY.
+RANGE frames rely on value ranges based on a value from the current row.
+RANGE frames are data type dependent.
+For non-unique values within the partition, a CURRENT ROW boundary may cover more than one row.
+GROUPS frames rely on groups of rows that share the same value for the ORDER BY expressions.
+Practical Framing Examples
+Tips
+
+Be careful choosing the appropriate frame type.
+Remember that a ROWS frame boundaries are counted based on row position, regardless of the actual values, while RANGE frame boundaries are evaluated based on the value offsets, regardless of how many rows qualify.
+Defaults, Shortcuts, Exclusions, and NULL Handling
+It is highly recommended to spell the full syntax out and not to use syntax shortcuts.
+
+Important!
+Remember that specifying ORDER BY without a frame definition defaults to RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW which might not be intuitive!
+
+Frame exclusions are not widely supported, and the default is EXCLUDE NO OTHERS.
+NULL order is handled using NULLS FIRST or NULLS LAST, but be careful, as not all relational database management systems sort NULLs the same way!
+
+Offset functions use the NULL treatment RESPECT NULLS and IGNORE NULLS.
+
+The WINDOW clause allows reuse of a window definition using an alias.

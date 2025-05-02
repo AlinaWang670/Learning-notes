@@ -1,0 +1,238 @@
+Advanced SQL - Logical Query Processing
+
+Agenda
+- Introduction
+- Constructing the source data set
+- Filtering with WHERE
+- Grouping and group filtering
+- Ordering and paging
+- Conclusion
+
+Tool
+- SOLite ...
+- SBeaver ...
+
+1.1 Single data source queries
+- Source Data
+	SELECT 'Hello World'
+	[FROM sysdual;]
+	- Source Data Set Requirements
+		- Each set is uniquely aliased
+		- Each column is uniquely aliased
+		- Sets are unordered
+	- The relational model deals exclusively with sets. Sets consist of unique elements
+	- SQL allows for "sets" with duplicate rows called "multi-set", or "bags".
+
+	SELECT *, 'SQL IS FUN' as Fact
+	FROM Staff
+
+1.2 Dual source query processing
+- Step 1: Cartesian Product (every join starts with this cartesian product)
+	- Cross Join: each pair each
+- Step 2: Qualification
+	- [Inner] Join: ON A.value = B.value
+- Step 3- Left Reservations: reservation the unqualified row from the left
+	- Left [outer] join
+	- Right [outer] join
+	- Full [outer] join
+	- A INNER JOIN B ON A.X = B.X
+	- A INNER JOIN B USING (X)
+- A NATURAL JOIN B (Assuming X is the only common alias) {avoid using}
+- side note: Composite natural keys are somewhat of an inconvenience as we must type multiple predicates instead of just one
+		SELECT AD.*, A.Tmplant_chip_ID, A.Breed [A.Name, AD., AD.]
+		FROM Animals AS A
+		INNER JOIN [LEFT OUTER JOIN]
+		Adoptions AS AD
+		ON  AD.Name = A.Name
+			AND 
+			AD.Species = A.Species;
+
+1.3 Joining Multiple Source Data Sets
+	SELECT Foo, Bar
+	FROM A INNER JOIN B
+			ON A.X = B.X
+		INNER JOIN C
+			ON C.Y = B.Y
+		INNER JOIN D
+			ON D.Z = C.Z
+- For INNER JOIN, the order doesn't matter;
+- For OUTER JOIN, the processing order does matter
+INNER JOIN:
+	SELECT *
+	FROM Animals AS A
+		INNER JOIN 
+		Adoptions AS AD
+		ON AD.Name = A.Name AND AD.Species = A.Species
+		INNER JOIN
+		Persons AS P
+		ON P.Email = AD.Adopter_Email;
+OUTER JOIN:
+	SELECT *
+	FROM Animals AS A
+		|LEFT OUTER JOIN|
+		Adoptions AS AD
+		ON AD.Name = A.Name AND AD.Species = A.Species
+		|LEFT OUTER JOIN|
+		Persons AS P
+		ON P.Email = AD.Adopter_Email;
+	OR
+	SELECT *
+	FROM Animals AS A
+	LEFT OUTER JOIN
+		Adoptions AS AD
+		LEFT OUTER JOIN
+		Persons AS P
+		ON P.Email = AD.Adopter_Email
+	|ON AD.Name = A.Name AND AD.Species = A.Species;|
+- Chiastic Order: (parentheses are not required, but recommended)
+	A INNER JOIN 
+		B INNER JOIN
+			C INNER JOIN
+			D ON D.Z = C.Z
+		ON C.Y = B.Y
+	ON A.X = B.X
+
+2.1 Filter Source Rows
+- Comparison: 
+	SELECT *
+	FROM A INNER JOIN B
+		ON A.X = B.X
+			AND A.X > 1;
+
+	SELECT * 
+	FROM A INNER JOIN B
+		ON A.X = B.X
+	WHERE A.X > 1;
+	- Results are the same, but the logical processing is different. This distinction is critical
+- Comparison 2 - OUTER JOIN
+	SELECT *
+	FROM A LEFT OUTER JOIN B
+		ON A.X = B.X
+			AND A.X > 1;
+
+	SELECT * 
+	FROM A LEFT OUTER JOIN B
+		ON A.X = B.X
+	WHERE A.X > 1;
+	- A,B -> Chiastic order -> Qualified rows -> Reservation ->select
+	- Second one finds no reservation step find no unmatched row to be reintroduced and both rows are passes on to the where clause
+	- For outer joins, moving a predicate from the join qualification to the where clause changes the meaning of the query!
+
+2.2 Missing data and ternary logic
+- NULL is NOT a value
+	It is an indicator to the absence of a value
+- NULL Types (not implemented)
+	- A-Values: missing value but applicable - "The value exists, we just don't know it"
+	- I-Values: missing value but Inapplicable - "This attribute is irrelevant for this tuple"
+- Ternary logic:  
+	[a      |b      |a OR b |a AND b|a=b    |NOT a]
+	[True   |True   |True   |True   |True   |False]
+	[True   |False  |True   |False  |False  |False]
+	[True   |unknown|True   |Unknown|Unknown|False]
+	[False  |True   |True   |False  |False  |True]
+	[False  |False  |False  |False  |True   |True]
+	[False  |Unknown|Unknown|False  |Unknown|True]
+	[Unknown|True   |True   |Unknown|Unknown|Unknwon]
+	[Unknown|False  |Unknown|False  |Unknown|Unknown]
+	[Unknown|Unknown|Unknown|Unknown|Unknown|Unknown]
+
+2.3 Dealing with ternary logic in SQL
+- Every comparison operation involving nulls always evaluated to a null
+- IS NOT NULL / IS NULL
+- Post-proceduse SQL
+	SELECT *
+	FROM animals a 
+	WHERE breed IS DISTINCT FROM 'Bullmastiff';
+
+	SELECT *
+	FROM animals a
+	WHERE (breed = 'Bullmastiff') IS NOT TRUE;
+
+3.1 GROUPING
+	SELECT COUNT(*) AS Count
+	FROM Animals
+	GROUP BY Species;
+- evaluated per group, encapsulate them in an aggregate function
+- After the data set is groupes, we can only reference the grouping expressions since they are guaranteed to have the same value for all rows within a group
+- All other expressions must be enclosed in an aggregrate function to guarantee the same.
+	SELECT Name,Species, Count(*) AS Count
+	FROM Vaccinations
+	GROUP BY Name, Species;
+
+3.2 Dealing with NULLs and elimination duplicates
+- GROUP BY string
+- A NULL is never equal to another NULL; They are not distinct from each other.
+- Aggregating NULLs: aggregation ignores NULLs
+- MAX(Value), MIN(Value), SUM(Value), COUNT(*)[count the rows per group], Count(Value)
+	SELECT DISTINCT Species, Name
+	FORM Vaccinations;
+
+3.3 Goup filters
+- HAVING: after group by, apply to row groups
+	SELECT Adopter_Email, 
+		COUNT(*) AS Number_Of_Adoptions
+	FROM Adoptions
+	WHERE Adopter_Email NOT LIKE '%gmail.com'
+	GROUP BY COUNT(*) > 1
+	ORDER BY Number_Of_Adoptions DESC;
+
+4.1 Presentation ordering in multitier architecture
+- Application Tiers: Data <> Business <> Presentation
+
+4.2 Ordering result sets
+- ERROR!
+	SELECT DISTINCT Species, Name
+	FROM Adoptions
+	ORDER BY Adoption_Date DESC;
+- The one we discussed, group by verses distinct for eliminating duplicates. Adding distinct effectively groups by all select expressions. And duplicate rows will be grouped into one. The grouping is done only for the select list expression, so any other expression may have multiple values for each group. 
+- NULL order: Database treats them differently
+
+4.3 Paging result sets
+- Paging, or pagination is the process of separating large row sets into smaller, disgestable chunks known as pages.
+	SELECT *
+	FROM Animals
+	ORDER BY Admission_Date DESC
+	OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
+	/ LIMIT 3 OFFSET 0;
+
+0. Introduction
+1. Subqueries Set Operatiors
+2. Advanced Joins
+3. More on Groupings
+4. Recursions and Iterations
+5. Conclusion
+
+1.1 Subqueries
+- Table Expression
+- Scalar expression
+- Row Expression
+----------
+- Non-correlated
+- Correlated
+----------
+Non-Correlated Subquery
+SELECT Foo,
+	(
+	SELECT AVG(Foot)
+	FROM Bart) AS Bar
+FROM FooBar;
+
+Correlated Subquery
+SELECT Foo
+	(SELECT AVG(Foot)
+	FROM Bart
+	WHERE Bart.Foot = Foobar.Foo
+	) AS Bar
+FROM FooBar;
+
+EXIST
+SELECT *
+FROM Persons AS P
+WHERE EXISTS (
+			SELECT NULL
+			FROM Adoptions AS A
+			WHERE A.Adopter_Email = P.Email
+			);
+
+1.2 Set Operators
+

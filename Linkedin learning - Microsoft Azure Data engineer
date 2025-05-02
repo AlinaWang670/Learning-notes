@@ -1,0 +1,1094 @@
+Linkedin learning - Microsoft Azure Data engineer associate
+
+** Lesson 1: design a data storage structure **
+1.1 design an azure data lake solution
+1.2 recommend file types for storage
+1.3 recommend file types for analytical queries
+1.4 design for efficient querying
+
+1.1 Design an azure data lake solution
+Azure data storage options
+.Blob storage
+	.cheapest storage type
+	.liftcycle mangement
+	.flat namespace
+	.slower query performance
+.Data lake storage gen2
+	.build on top of blob storage
+	.Hierarchical namespace with faster query performance
+
+Azure Data Lake storage Gen2 (DLS)
+. Hadoop-compatible file system
+	.Big data analystics
+	.POSIX-like directory and file permissions
+	.Scalable
+	.Don't need to move data prior to analysis
+
+1.2 File types for data storage
+. Delimited Text(CSV)
+	.Plaintext format with schema on read
+	.Used for import/export
+.JavaScript Object format
+	.nexted plaintext format
+	.used in web services
+.Apache Avro - binary
+	.Binary format that's great for write operations, slower to read
+	.Includes a schema
+
+1.3 File Type for querying
+- Apache Parquet
+	-Binary format that stores columnar data
+	-Schema/metadata travels with the data
+	-Fast query performance with reduced disk I/O
+
+1.4 Design for efficient querying
+- How many bytes does your query read and write
+- How CPU intensive is the query
+- Field indexing
+	- Primary key
+	- Partition key
+	- Row key
+
+Manage ACL - Access control list
+Azure Data Lake Storage Query Acceleration
+Azure Data Explorer - no relational data
+	- help sample
+
+** Lesson 2: Design for Data Pruning **
+2.1 Design a folder structure that represents levels of data transformation
+2.2 Design a distribution strategy
+2.3 Design a data archiving solution
+
+2.1 Design Storage for data pruning
+-Pruning is removing irrelevant data to accelerate queries
+	- could be done in a transformation phase (in the ETL,ELT process)
+-Solution: Data Partitioning
+-Azure Data Lake Gen 2: Query acceleration
+-Synapse SQL pool: T-SQL partition clause
+-Apache Spark: Repartition data in memory
+
+2.2 Strategize Data Distribution
+- Azure Synapse Dedicated SAP Pools
+	- 60 distributions for Massively Parallel Processing (MPP)
+-Distribution methods:
+	- Hash
+	- Round-robin
+	- Replicated all rows
+
+2.3 Design for Data Archival
+-Azure Storage access tiers
+- Hot translation>storage
+- Cool storage>translation
+- Archive
+
+Azure synapse analytics
+
+** Lesson 3: Design a Partition Strategy **
+3.1 Design a partition strategy for files
+3.2 Design a partition strategy for analytical workloads
+3.3 Design a partition strategy for efficiency/performance
+3.4 Design a partition strategy for azure synapse analytics
+3.5 Identify when partitioning is needed in Azure Data Lake Storage Gen2
+
+3.1 Partition strategies for file data
+(choosing the right data files)
+- Azure blob storage
+	- Range partitining based on lexical sequence
+	- report01012019.csv, ...csv
+- ADLS Gen2
+	- Consider Premium
+	- Plan the directory structure
+	- choose right file type
+	- implement azure data factory (ADF) to move files into their apporproate directories
+
+3.2 partition strategy - analytic workloads
+- Horizontal partitioning (sharding)
+	- Divide table row data across distributions
+- Certical partitioning
+	- Divide table column subsets to different distributions
+- Functional Partitioning
+	- storing disserent tables on different partitions to support business requirements
+		- sensitive and non-sensitive tables
+
+Partitioning for performance
+- Optimize data distribution to minimize cross-partition data transfers
+- Size the cluster apporproately to support parallelism
+- Check query plans to help you refactor queries for maximum performance
+
+3.4 Design partition for azure synaose
+- SQL pool types
+	- Serverless
+	- Dedicated
+- SQL pool partition methods
+	- Hash, round-robin, replicated
+		Remember that hash is good for larger tables that are above two gigabytes in size that are going to have regular IO, round robin is good for staging or temp tables 'cause you're not really concerned about tracking where each row is on each distribution, and replicated is good for small under two gig tables that you want to have available for most of your queries that you've identified.
+ADLS Gen2 Partitioning
+- Data rates
+	- Ingress: Data ingested into Azure Storage
+	- Egress: Data moved out of Azure Storage (Charged)
+- Data rates are limited per storage account
+	- See quotas and limits MS Learn doc page
+
+** Lesson 4: Design the Serving Layer **
+4.1 Design star schemas
+4.2 Design slowly changing dimensions
+4.3 Design a dimensional hierarchy
+4.4 Design a solution for temporal data
+4.5 Design for incremental loading
+4.6 Design analytical stores
+4.7 Design metastores in Azure Synapse Analytics & Azure Databricks
+
+4.1 Design Star Schemas
+relational data
+- Part of a relational data warehouse
+- Fact (content) tables
+	- Higher volume
+	- Use hash distribution with clustered columnstore indexes
+- Dimension (context) tables
+	- Smaller size
+	- use replicated distribution
+- Snowflake schema has multiple levels
+
+Slowly Changing Dimensions (SCDs)
+- Infrequently changing data (surname; e-mail address)
+- Azure Synapse SQL Pools support SCD, but you need to implement the logic yourself
+	- Azure Data Factory (ADF)
+- SCD Type 1
+	- Old column value is overwritten and no history is kept
+- SCD Type 2
+	- Maintain complete column value change history
+- SCD Type3
+	- Maintain partial column calue change history (Original data columns)
+
+4.3 Design a dimensional hierarchy
+- Example: Model an organizational chart reporting structure
+
+4.4 Temporal data solutions
+- temporal data refers to data as it exists at a point in time
+	- Example: forensic investigations
+- Azure SQL temporal tables track all data changes over time
+- CREATE TABLE WITH SYSTEM_VERSIONING = ON
+
+4.5 Incremental data loading
+- Ingesting data in smaller increments over time
+- Extract, Transform, Loading (ETL) pipelines
+-> Azure Data Factory (ADF)
+
+4.6 Design analytical stores
+HTAP - Hybrid Transaction and Analytical Processing
+Data analytical stores - speed data access and reduce contention
+- Analytical stores serve data output by your ingestion/transformation piprline to business intelligence (BI) tools
+- Cosmos DB (Azure's default noSQL database) analytical store
+	- Optopnal adjunct to transactional store
+	- Integrate Cosmos DB with Azure Synapse
+		- Azure Synapse Link for Cosmos DB
+
+4.7 Matastore Sesign
+- Metastore is a data caatalog implemented in Apache Spark that describes your data model and structure
+- Managed Apache Hive Metastore (HMS)
+- Azure options
+	- Azure Synapse Spark Pool - noSQL
+	- Azure Databricks
+- Hive Metastore service options
+	- Azure SQL Database
+	- Azure Database for MySQL
+"understanding the star scheme" - PowerBI doc
+
+** Lesson 5: Implement Physical Data Storage Structures **
+5.1 Implement compression
+5.2 Implement partitioning
+5.3 Implement sharding
+5.4 Implement different table geometries with Azure Synapse Analytics pools
+5.5 Implement data redundancy
+5.6 Implement distributions
+5.7 Implement data archiving
+
+5.1 Implement Compression
+- Copy Data task supports data compression using several algorithms. Supprt data types:
+	- bzip2
+	- gzip
+	- deflate
+	- ZipDeflate
+- Azure Data Factory (ADF)
+- Azure Synapse pipelines
+
+5.2 Implement partitioning
+- Azure Synapse SQL pools
+- Partitioning allows Synapse MPP to make queries run faster
+
+5.3 Implememt Sharding
+- Horizontal partitioning in Azure Synapse SQL pool
+
+5.4 Implement Azure Synapse Table Geometries
+- Azure Synapse SQL pool table structure: (how it is accesses)
+	- Distributions
+	- Indexed
+	- Partitions
+- Index types:
+	- Clustered columnstore: Best for large fact tables (star schema)
+	- Heap: Best for temporary data loading scenarios
+	- Clustered: Best for row-based loopup queries
+
+5.5 Implement data redundancy
+- Protecting data from outages by deplicating the data on replica sources (especially across regions)
+- Azure Storage redundancy:
+	- Locally redundant storage (LRS)
+	- Zone-redundant storage (ZRS)
+	- Geo-redundant storage(GRS)
+	- Geo zone-redundant storage (G-ZRS)
+
+** Lesson 6: Implement Logical Data Structure **
+6.1 Build a temporal data solution
+6.2 Build a slowly changing dimension
+6.3 Build a logical folder structure
+6.4 Build external tables
+6.5 Implement file & folder structures for efficient querying and data pruning
+
+6.1 Temporal Data Solutions
+refers to:
+- Azure SQL feature
+- Built-in change-tracking capability without further coding required
+- Create system-versioned tables
+
+6.2 Slowly changing dimensions
+- SCD questions:
+	- Do we need to keep track of table changes?
+	- How long of a history should we maintain?
+
+6.3 Bild Logical Folder Structures
+- Take advantage of ADLS Gen2's hierarchical file system
+- Folder: {project}/{yyyy}/{mm}
+- Compare with the Blob service's flat object storage model
+- Query acceleration SDK extensions apply both to Blob storage and ADLS Gen2
+
+6.4 Build external tables
+- Define tables in Azure SQL in which data exists in external storage like ADLS Gen 2 or Blob storage
+	- Direct reads form the external data source
+- Supports delimited plain text and binary source files
+	- PolyBase
+- CREATE EXTERNAL TABLE T-SQL statement
+- Microsoft recommends the more concise COPY statement for data loads
+
+6.5 Implement file and folder structures for Purnings
+- Ingest data into Azure Synapse SQL pools via external data sources
+- Efficient partition managemnet operations:
+	- Deletion
+	- Switch
+
+** Lession 7: Implement the serving lager **
+7.1 Deliver data in a relational star schema
+7.2 Deliver data in parquet files
+7.3 maintain metadata 
+7.4 Implement a dimensional hierarchy
+
+7.1 Deliver data with star schema
+- Common data warehouse pattern with Azure Synapse Dedicated SQL pools
+- Fact and dimension tables
+- Foreign key constraints are not supported, so you have to implement that logc in your application code
+	- INSERT, UPDATE, DELETE Triggers
+	- Data integrity checks
+
+7.2 Deliver data in Parquet files
+- Apache Parquet is a binary, column-based data format that is free, open-source, and language-agnotic
+- Azure SQL, Azure Synapse, and Azure Databricks can work with Parquet files natively
+
+7.3 maintain matadata
+- Shared matadata stores are data catalogs that track the structure of your data warehouse, specifically between:
+	- Synapse SQL pools
+	- Synapse Spark pools
+- Azure Databricks used the Apache Hive metastore
+
+7.4 Implement Dimensional Hierarchy
+- In a relational model, data model dimensions are implemented with table relationships:
+	- One-to-many
+	- Many-to-many
+
+** Lesson 8: Ingest & Transform Data **
+8.1 Transform data by using Apache Spark
+8.2 Transform data by using Transact-SQL
+8.3 Transform data by using Data Factory
+8.4 Transform data by using Azure Synapse Pipelines 
+8.5 Transform data by using Stream Analytics
+
+8.1 Data transforms with apache spark
+- Apache Spark has two data transformation APIs:
+	- Resilient Distributed Datasets: Spark's most fundamental data structure; supports parallel operations
+	- DataFrames: In-memory table structures that support operations familiar to relational database developers
+
+8.2 Data Transforms with T-SQL
+- Transact-SQL is Microsoft's procedural data access language
+- Common data transformation T-SQL commands
+	- SELECT, ORDER BY, GROUP BY, DISTINCT, JOIN
+- Don't forget about Azure Data Factory (ADF)- using pipelines
+
+8.3 Data Transforms with ADF
+- Define datasets in Data Factory Studio
+	- Azure and non-Azure data sources
+- Schema, row, and multi-I/O transformations
+- Pipelines and JSON pipeline templates
+	- Copy from Google BigQuery to ADLS Gen 2
+	- Copy from HDFS to ADLS Gen 2
+
+8.4 Transform data by using Azure Synapse Pipelines
+- ADF and Synapse Pipelines allow you to automate ETL and ELT operations
+- Trigger options:
+	- Manual
+	- Schedule
+	- Event-driven
+
+8.5 Data Transforms with Stream Analytics
+- ASA is a stram-processing engine
+- Ingestion optioins:
+	- Event Hub, loT Hub, Kafka
+- SQL-like query language
+	- Stream Analytics query Language (SAQL)
+
+** Lesson 9: Work with Transformed Data **
+9.1 Cleanse data
+9.2 Split data
+9.3 Shred JSON
+9.4 Encode & decode data
+
+9.1 Cleanse data
+- Important data transformation step
+- Dedupication
+- Handle missing/null values
+	- Substitute with default values
+- Trim trailing whitespace
+- Standardize values
+- Classify, obfuscate, or remove sensitive data
+
+9.2 Split data
+- Conditional split ADF activity (azure data factory)
+- Useful in machine learning model training
+	- Create Azure Synapse SQL pool tables with distribution method
+
+9.3 Shred JSON
+- Shredding involoves extracting JSON data and placing it into tables
+- Can be implemented easily in Apache Spark
+	- spark.read.json("absfss://filesys/proj/*.json")
+- Also implemented in T-SQL with PolyBase
+	- SELECT FROM OPENROSWSET()
+
+9.4 Encode & Decode Data
+- ASCII, UTF-8, and UTF-16 all encode bits into characters (and vice-versa)
+- Azure Synapse SQL
+	- Collation determines encoding and sorting type for string data
+- Apache Spark
+	- encode and decode methods
+- Pipeline support via ADF
+
+** Lesson 10: Troubleshoot Data Transformations **
+10.1 Configure error handling for the transformation
+10.2 Normalize & denormalize values
+10.3 Transform data by using Scala
+10.4 Perform data exploratory analysis
+
+10.1 Configure Error Handling
+- Configuring error handling in ADF for data transformation steps
+- Data flow activity options:
+	- Success, Failure, Completion, Skipped
+- ADF Sink activity writes error messages to external data store
+
+10.2 Normalize and demornalize values
+- Data normalization and denormalization in Azure Data Factory (ADF) with transformation activities
+- Pivot transformation creates multiple columns from the unique row values in a single column
+	- Denormalization
+	- Aggrefates data
+- Unpivot transformation turns unnormalized data into a normalized representation
+	- Expands values from multiple columns in a single record into multiple records with the same values in a single column
+
+10.3 Transform Data by Using Scala
+- Scala is a strongly typed general-purpose programming language
+- Scala is a popular language in data analysis circles, followed closely by Python
+
+10.4 Perform Data Exploratory Analysis
+- EDA - mining insights from your datasets
+- Synapse Spark Pool: Right-click data file and select Load to DataFrame from the shortcut menu
+- Synapse SQL Pool: Right-click data fiel and choose Select TOP 100 rows from the shortcut menu
+- Azure Data Factory has a Data preview tab in its studio UI
+
+** Lesson 11: Design a Batch Processing Solution **
+11.1 Develop batch processing solutions by using Data Factory, Data Lake, Spark, Azure Synapse Pipelines, PolyBase, & Azure Databricks
+11.2 Create data piprlines
+11.3 Design & implement incremental data loads
+11.4 Design & develop slowly changing dimensions
+11.5 Handle security & compliance requirements
+11.6 Scale resources
+
+11.1 Develop Batch Processing Solutions
+- Batch processes work best on the basis of a trigger:
+	- Manual
+	- Schedule
+	- Event-driven
+- Relevant Azure services:
+	- ADF
+	- ADLS Gen2 (Data lake storage Gen2)
+	- Azure Databricks
+	- Azure Synapse (Spark and SQL pools)
+
+11.2 Create Data Pipelines
+- Stitch together ETL, ELT, or ML processes in an automated fashion
+- Azure Data Factory
+- Azure Machine Learning Service
+- Azure DevOps
+- Triggers:
+	- Manual
+	- Schedule
+	- Event
+
+11.3 Incremental Data Loading
+- Leverage the ADF linked service library
+- Consider strong credentials in Azure Key Vault
+
+11.4 Design Slowly Changing Dimensions
+- Infrequently updated information
+	- Previous X addresses
+- Requirement: Store previous values
+- Implement with ADF pipeline
+
+11.5 Security & Compliance Requirements
+- Azure Policy is your go-to compliance solution in Azure
+- Azure Security Benchmark initiative
+
+11.6 Scale Resources
+- Auzre abstraction units
+- Event Hubs
+	- Throughut Unit
+- Azure Data Factory
+	- Data Integration unit (DIU)
+- Stream Analytics
+	- Streaming Units (SU)
+
+** Lesson 12: Develop a Batch Processing Solution **
+12.1 Configure the batch size
+12.2 Design & create tests for data pipelines
+12.3 Integrate Jupyter/Python notebooks into a data pipeline
+12.4 Handle duplicate data
+12.5 Handle missing data
+12.6 Handle late-arriving data
+
+12.1 Configure the batch size
+- Azure Batch simplifies large-scale parallel and high-performance computing (HPC) batch jobs
+- Choosing VM size and image for batch workload
+- VM sizing questions:
+	- Number of tasks per VM node
+	- VM size availability per region
+	- Azure Batch account VM quota limits
+
+12.2 Design & Create Data Pipeline testing
+- We can combine Azure DevOps CI/CD pipelines with Azure Data Factory (ADF) pipelines
+- Define ADF pipelines as JSON stored in Azure Repos
+- Define ADF pipeline tests as an Azure DevOps pipeline
+- Code commits automatically trigger the ADF pipeline testing
+	- "Break fast, fix fast"
+
+12.3 Notebook/Pipeline Integration
+- ADF Spark activity enables you to load a Jupyter notebook into a data pipeline
+	- make sure to create linked services to data sources first
+
+12.4 Handle duplicate Date
+- ADF Aggregate transformation is useful to filter out duplicate rows
+
+12.5 Handle missing data
+- During transformation phase, we can:
+	- Filter out rows with missing data
+	- substitute missing values with default values
+
+12.6 Handle late arriving data
+- Late-arriving data can occur at any phase of a data pipeline:
+	- Ingestion
+	- Transformation
+	- Serving
+- You can avoid data loss by re-running your ADF pipeline on a schedule
+
+** Lesson 13: Configure a Batch Processing Solution **
+13.1 Upsert data
+13.2 Regress to a previous data
+13.3 Design & configure exception handling
+13.4 configure batch processing
+13.5 Revisit batch processing solution design
+13.6 Debug Spark jobs by using the Spark UI
+
+13.1 Upsert Data
+- "Upsert" is a combination of UPDATE and INSERT
+- SQL 
+	- If row value exists > update
+	- If row value doesn't exist > insert
+- Cosmos DB
+	- Historically "updates" were inserts because you couldn't modify existing JSON documents
+
+13.2 Regress to a Previous State
+- Rolling back data to a stable state
+- Core part of the relational data model
+- NoSQL systems can mimic this behavior
+	- Cosmos DB implements server-side JavaScript to create atomic transactions
+- Azure Data Factory
+	- Data consistency verification
+	- Skip incompatible rows
+	- Skip missing files
+
+13.3 Exception handling
+- TRY...Catch block in .NET SDK
+- Azure services have build-in exception handling logic
+- Azure Batch
+	- Error codes
+	- Logs
+- Event Hubs
+	- EventHubsException object in Event Hubs SDK
+
+13.4 Configure Batch Retention
+- Azure Batch task retention is 7 days by default, unless
+	- the task is deleted
+	- the compute node is removed
+
+13.5 Batch Processing design
+- Lambda architecture
+	- Hot path > streaming data
+	- Cold path > batch data
+
+13.6 Debug Spark Jobs with Spark UI
+- Spark UI shows what's happening in your application
+- Streaming tab: Shows related metrics (input rate, scheduling delay, processing time)
+- Completed batches
+
+** Lesson 14: Design a Stream Processing Solution **
+14.1 Develop a stream processing solution by using Stream Analytics, Azure Databricks, & Azure Event Hubs
+14.2 Process data by using Spark structured streaming
+14.3 Monitor for performance & functional regressions
+14.4 Design & create windowed aggregates
+14.5 Handle schema drift
+
+14.1 Develop stream processing solutions
+- Real-time data ingestion
+- Often split into "hot" and "cold" paths
+	- Lambda architecture
+- Core Azure event ingestion services:
+	- Event Hub
+	- loT Hub
+	- Apache Kafka
+
+14.2 Spark Structured Streaming
+- Incoming streaming data populated into a continuously growing table
+- Structure streaming queries are expected to return different result each time they are run
+- Writing modes:
+	- Complete: Entire result table written to data sink
+	- Append: Only new rows are written to sink
+	- Update: Only rows that are changed are updated
+
+14.3 Monitor for performance
+- Event Hubs
+	- Metrics Explorer (incoming, outgoing message flow)
+- Stream Analytics
+	- Metrics Explorer (input, output events)
+- Alert
+	- Signal
+	- Condition
+	- Action group
+
+14.4 Windowed aggregates
+- Azure Stream Analytics windowing functions for aggregate data
+- Tumbling window
+- Hopping window
+- Sliding window
+- Session window
+- Snapshot window
+
+14.5 Handle Schema Drift
+- Changes in event source can lead to schema changes
+- Azure Event Hubs
+	- Azure Schema Registry
+- Azure Databricks
+	- Schema Evolution
+
+** Lesson 15: Process Data in a stream Processing Solution **
+15.1 Process time series data
+15.2 Process across partitions
+15.3 Process within one partition
+15.4 Configure checkpoints/watermarking during processing
+15.5 Scale resources
+15.6 Design & create tests for data pipelines
+15.7 Optimize pipelines for analytical or transactional purposes
+
+15.1 Process Time Series Data
+- IoT sensor data is a good example of time series data
+- Time attribute
+	- Event time
+	- Processing time
+- Windowed aggregates
+
+15.2 Process Across Partitions
+- Event Hub partitions enable the service to process multiple data streams
+- Can also load balance a single stream across multiple partitions
+- Implement logic in Event Hubs client libraries
+
+15.3 Process Within One Partition
+- Customize processing in your application code
+- Event Hubs client libraries
+- EventHubConsumerClient.NET class
+
+15.4 Checkpoints and Watermarking
+- Checkpointing or watermarking is keeping a record of the last timestamp processed by your stream processing solution
+- Azure Stream Analytics does checkpointing periodically automatically
+- You need to implement Event Hubs checkpointing in code
+
+15.5 Scale Resources
+- Remember the compute is largerly abstracted away from us in the Azure cloud
+- Event Hubs: Throughout Units
+- 1 Throughput Unit:
+	- 1 MB/sec ingress (1,000 events/second)
+	- 2 MB/sec egress (~4,000 events/second)
+- In Event Hubs Premium, Throughput Units are called Processing Units
+ 
+15.6 Design & create tests for data pipelines
+- Integrating Azure Data Factory pipelines in your CI/CD processes
+	- Include automated pipeline testing
+- Note: Remember ADF pipelines are 1entirely different from Azure DevOps pipelines
+
+15.7 Optimize Pipelines
+- Applying file compression
+- Refactoring user-defined functions (UDFs)
+- Refactoring indexes
+	- Azure SQL Database
+	- Azure Cosmos DB
+
+** Lesson 16: Troubleshoot a Stream Processing Solution **
+16.1 Handle interruptions
+16.2 Design & Configure exception handling
+16.3 Upsert data
+16.4 Replay archived stream data
+16.5 Design a stream processing solution
+
+16.1 Handle interruptions
+- Reasons:
+	- Network connectivity problems
+	- Planned or unplanned maintenance events
+	- Bugs
+- Solution: Azure availability zones (AZs)
+
+16.2 Exception Handling
+- Look in the MS Learn dosc to learn each Azure services's built-in Exception classes
+
+16.3 Upsert data
+- Azure Stream Analytics supports compatibility levels to better handle upsert operations
+	- 1.2 is first version to support AMQP messaging protocol
+	- 1.0 and 1.1 do a property-level insert
+	- 1.2 onward to a replace document operation
+
+16.4 Replay Archived Stream Data
+- Event Hubs store up to 7 days' worth of data
+- Use client libraries to "replay" data streams
+
+16.5 Stream Processig Solutions
+- Phases
+	- Real-time data ingestion
+	- Stream processing
+	- Analytical data store
+	- Analytics and reporting
+
+** Lesson 17: Manage Batches and pipelines **
+17.1 Trigger batches
+17.2 Handle failed batch loads
+17.3 Validate batch loads
+17.4 Manage data pipelines in Data Factory and Synapse pipelines
+17.5 Schedule data pipelines in data factory and synapse pipelines
+17.6 implement version control for pipeline artifacts
+17.7 Manage Spark jobs in a pipeline
+
+17.1 Trigger Batches
+- Azure Functions
+	- Each function can have only one trigger
+- Trigger templates:
+	- HTTP
+	- Timer
+	- Event Grid
+	- Queue
+
+17.2 Handle failed batch loads
+- Azure Batch error types
+	- Pool errors
+		- Quota / Capacity issue
+	- Node errors
+		- Start task failure
+	- Job errors
+		- Task dependency problems
+	- Task errors
+		- Task exit code is non-zero
+		- Dependency failures
+
+17.3 Validate batch Loads
+- ADF Validation activity
+	- Verfy a file exists before proceeding with the data pipeline
+
+17.4 Manage data pipelines
+- Add, edit, remove linked services and integration runtimes
+- Import/export ARM JSON templates
+- Configure source control
+
+17.5 Schedule data pipelines
+- ADF and Synapse Pipeline triggers
+	- Manual
+	- Event
+	- Tumbling window
+	- Schedule
+
+17.6 Version Control for Data Pipelines
+- Git source code management (SCM)
+- Sources:
+	- Azure Repos
+	- Github
+
+17.7 Manage Spark Jobs in a pipeline
+- ADF
+- Create appropriate linked service
+	- Azure HDInsight
+	- Azure Databricks
+- Include appropriate ADF activity
+
+** Lesson 18: Design Security **
+18.1 Design data encryption for data at rest and in transit
+18.2 Design a data auditing strategy
+18.3 Design a data masking strategy
+18.4 Design for data privacy
+
+18.1 Encryption at rest and in transit
+- Encryption at rest: Data not in use located in the Azure data centers
+	- Storage Service (server-side) encryption
+	- Service managed vs custoner managed key
+	- Azure Key Vault (AKV)
+- Encryption in transit
+	- TLS/SSL binding over HTTPS
+
+18.2 Data Auditing Strategy
+- Diagnostic setting
+	- Log Analytics
+	- Azure Storage
+	- Event Hub
+- Azure SQL auditing
+
+18.3 Data Masking Strategy
+- Azure SQL Database Dynamic Data Masking (DDM)
+- DB admins are always exempt
+- Masking rules:
+	- Default (0, xxxx, 01-01-1900)
+	- Credit card (xxxx-xxxx-xxxx-1234)
+	- Email (axxx@xxxx.com)
+	- Customer (perfix [padding] suffix)
+
+18.4 Design for data privacy
+- Azure SQL Data Discovery & Classification
+- Identify and apply labels to sensitive data
+	- Personally identifiable information (PII)
+	- Financial data
+
+** Lesson 19: Design Security for data standards **
+19.1 Design a data retention policy
+19.2 Design to purge data based
+19.3 Design Azure RBAC & POSIX-like ACL for Data Lake Storage Gen2
+19.4 Design row-level & column-level security
+
+19.1 Data Detention Policy
+- Safely deleting data after it's out of business scope
+- Azure Storage lifecycle management policy
+	- Access tiers (archive)
+- Azure SQL Database long-term retention backup retention (10 years)
+
+19.2 Design for Data Purge
+- Safely deleting data per business requirements
+	- Not necessarily after data retention
+- ADF Delete activity
+- Azure Synapse SQL pool
+	- TRUNCATE T-SQL statement
+
+19.3 Design ACLs
+- Restricting data access only to authorized users
+- Azure role-bsed access control (RBAC)
+	- Azure Active Directory (Azure AD)
+- POSIX access control lists (ACLs)
+	- Azure Data Lake Storage Gen2
+	- File and folder-level security
+
+19.4 Row- and Column- level security
+- Azure SQL Database & Azure Synapse SQL pool
+- Row-level security
+	- T-SQL security policies
+	- CREATE SECURITY POLICY
+- Column-level security
+	- GRANT statement applies to table columns
+	- Always Encrypted
+
+** Lesson 20: Implement data security protection **
+20.1 Implement data masking
+20.2 Encrypt data at rest & in motion
+20.3 Implement row-level & column-level security
+20.4 Implement Azure RBAC
+20.5 Implement POSIX-like ACLs for Data Lake Storage Gen2
+20.6 Implement a data retention policy
+20.7 Implement a data auditing strategy
+
+20.1 Implement data masking
+- Azure SQL Database Dynamic Data Masking (DDM)
+- At-rest data is not actually encrypted or obfuscated
+- Admins are always exemot
+- Masking rule formats:
+	- Default (0, xxxx, 01-01-1900)
+	- Credit card (xxxx-xxxx-xxxx-1234)
+	- Email (axxxx@xxxx.com)
+	- Customer string (prefix [padding] suffix)
+
+20.2 Encryption at Rest and in Motion
+- Data encrypted at rest
+	- Storage Service (service-side) encryption
+	- Service-managed vs customer-managed keys
+	- Double encryption
+	- Azure Key Vault (AKV)
+- Data encrypted in motion
+	- TLS/SSL binding over HTTPS
+	- Microsoft certtificates vs customer certificates
+
+20.3 Row- & column-level security
+- Auzre SQL row-level security
+	- T-SQL security policy
+- Azure SQL column-level security
+	- GRANT statement on selected table columns
+	- Always Encrypted
+
+20.4 Implement Azure RBAC
+- Preferred authentication and authorization strategy in Azure
+- Role-based access control (RBAC)
+- Least privilege authorization
+- Azure AD Privileged Identity Management (Azure AD PIM)
+- Entra Permissions Management (EPM)
+	- Microsoft Entra 
+
+20.5 POSIX-like ACLs
+- ADLS Gen2 feature
+- File and folder-level security using access control lists (ACLs)
+
+20.6 Data Retention Policy
+- Azure SQL long-term retention policy (10 years)
+- Azure Blob storage lifecycle management policy
+	- Access tiers (Archive)
+
+20.7 Data Auditing strategy
+- Diagnostic settings
+	- Log Analytics
+	- Azure Storage
+	- Event Hub
+- Azure SQL auditing
+
+** Lesson 21: Implement data security access **
+21.1 Manage identities, keys, secrets across different data platforms
+21.2 Implement secure endpoint (private & public)
+21.3 Implement resource tokens in Azure Databricks
+21.4 Load a DataFrame with sensitive information
+21.5 Write encrypted data to tables or Parquet files
+21.6 Manage sentivite information
+
+21.1 manage Identities, keys and secrets
+- Azure AD identities
+	- Users, groups
+	- App registration service principals
+	- Managed identities
+- Azure Key Vault assets
+	- Envrypted keys
+	- Secrets (secure string data)
+	- Certificates
+
+21.2 Implement secure endpoints
+- Public endpoint is default Azure endpoint
+- Private endpoints
+- resources firewall
+
+21.3 Implement resource tokens in Azure Databricks
+- Personal Access Token (PAT)
+- Azure Databricks alos supports Azure AD tokens
+
+21.4 Load DataFrame with sensitive information
+- How to handle personally identifiable information (PII) using encryption and decryption
+- Implement Fernet encryption library and user-defined functions in your Azure Databricks code
+
+21.5 Write encrypted data
+- Azure Databricks can write data anywhere you have a path and an authorization token, including Apache Parquet files
+
+21.6 Manage sensitive information
+- Azure SQL Database Data Discovery & Classification
+- Microsoft Defender
+	- for SQL
+	- for Storage
+
+** Lesson 22: Monitor Data Storage **
+22.1 Implement logging used by Azure Monitor
+22.2 Configure monitoring services
+22.3 Measure performance of data movement
+22.4 Monitor & update statistics about data accross a system
+22.5 Monitor data pipeline performance
+22.6 Measure query performance
+
+22.1 Implement logging used by Azure Monitor
+- Azure Monitor
+	- Metrics
+	- Logs
+- Log Analytics
+	- Kusto Query Language (KQL)
+
+22.2 Configure monitoring services
+- Infrastructure monitoring
+- Application monitoring
+- Subscription monitoring
+- Tenant Monitoring
+- Data sinks
+	- Log Analytics
+	- Azure Storage
+	- Event Hubs
+
+22.3 Measure data movement performance
+- ADF Monitoring tab
+- Pipeline runs
+- Trigger runs
+- ADF keeps pipeline details for 45 days
+	- Use Log Analytics for longer-term reporting and archival
+
+22.4 Monitor & update statictics about data across a system
+- Azure Synapse SQL pool
+- Cost-based optimizers (CBOs) instruct Synapse to choose lowest cost query plan
+- Necessity of statstics collection
+	- ALTER DATABASE [dw] SET
+	AUTO_CREATE_STATISTICS ON;
+
+22.5 Monitor data pipeline performance
+- ADF Monitoring tab
+
+22.6 Measure query performance
+- Benchmarking SQL query performance
+
+** Lesson 23: Monitor data processing **
+23.1 Monitor cluster performance
+23.2 Understand custom logging options
+23.3 Schedule & monitor pipeline tests
+23.4 Interpret Azure Monitor metrics & logs
+23.5 Interpret a Spark Directed Acyclic Graph (DAG)
+
+23.1 Monitor cluster performance
+- Azure HDInsight
+	- Apache Hapdoop or Spark cluster
+- HDInshight Ambari web dashboard provides cluster health data
+
+23.2 Understand custom logging options
+- Log Analytics supports custom logs
+- Host machine(s) must run Azure Monitor Agent
+- Procedure
+	- Upload sample log file for Log Analytics to parse
+	- Customize metadata
+
+23.3 Schedule & monitor pipeline tests
+- Using CI/CD pipelines to deploy ADF and run pipelines
+	- Azure DevOps
+	- GitHub Actions
+- "Shift left" testing methodology
+
+23.4 Azure Monitor Metrics & logs
+- Metrics
+	- Metrics Explorer
+- Logs
+	- Log analytics
+- Alerts
+
+23.5 Spark Directed Acyclic Graph (DAG)
+- Directed Acyclic Graph (DAG)
+- Spark cluster needs to figure out which batch tasks it can run in parallel
+- DAG is essentially a job execution plan
+
+** Lesson 24: Tune Data Storage **
+24.1 Compact small files
+24.2 Rewrite user-defined functions (UDFs)
+24.3 Handle skew in data
+24.4 Handle data spill
+24.5 Tune shuffle partitions
+24.6 Find shuffing in a pipeline
+24.7 Optimize resource management
+
+24.1 Compact small files
+- Big data analytics products are optimized to read large files
+- Apache Spark bin packing combines small files into large ones to improve query performance
+- ADF has merge option in the Copy activity
+
+24.2 Rewrite UDFs
+- Refactor repetitive scripts into server-side UDFs
+- Azure Synapse SQL pool
+	- CREATE FUNCTION T-SQL statment
+- Stream Analytics and COsmos DB implement UDFs as JavaScript files that return scalar (single) value results
+
+24.3 Handle Data Skew
+- Skew is uneven data distribution in a dataset
+- Skew repair at storage layer
+	- Choose better data partitioning stratege
+- Skew repair at compute layer
+	- Enable statistics to improve query plan
+
+24.4 Handle Data Spill
+- Processing engine can't hold all results data in memory and offloads some to disk
+- Symptiom: Azure Synapse SQL running out of space in TempDB
+- Solutions:
+	- Resize compute layer
+	- Reduce partition sizes
+
+24.5 Tune shuffle partitions
+- Apache Spark shuffles data between nodes
+- Preferable to reduce shuffle in Spark queries
+- Shuffle is set in a Spark configuration parameter
+
+24.6 Find Shuffling in a Pipeline
+- In Azure Synapse SQL and Apache Spark, use the EXPLAUN statement to understand query execution plans
+
+24.7 Optimize Resource Management
+- Cost optimization
+- Pause Azure Synapse pools
+- Consider Azure Spot instances
+
+** Lesson 25: Optimize& Troubleshoot Data Processing **
+25.1 Tune queries by using indexers
+25.2 Tune queries by using cache
+25.3 Optimize pipelines for analytical or transactional purposes
+25.4 Optimize pipeline for descriptive versus analytical workloads
+25.5 Troubleshoot failed Spark jobs
+25.6 Troubleshoot failed pipeline runs
+
+25.1 Tune queries by using indexers
+- Azure Synapse SQL
+	- Clustered columnstone index: Default
+	- Clustered index: Good for use in WHERE clauses
+	- Heap index: Suitable for staging tables
+- Azure Synapse Spark
+	- No native indexing
+	- Microsoft Hyperspace API, works with CSV, JSON, Parquet
+
+25.2 Tune queries by using cache
+- Azure Synapse SQL
+	- Result set caching (ALTER DATABASE SET RESULT_SET_CACHING ON;)
+- Azure Synapse Spark
+	- cache() and persist() methods cache intermediate results of RDDs, DataFrame, and datasets
+
+25.3 Optimize Pipelines
+- Data processing systems
+	- OLTP
+	- OLAP
+- Hybrid Transactional Analytical Processing (HTAP) solutions
+	- Azure Synpase Link for Cosmos DB
+
+25.4 Optimize pipelines
+- Analytical workload types
+	- Descriptive: Determines what happened in pipeline
+	- Diagnostic: Determines why a pipeline failure happened, or where room for improvement can be realized
+	- Predictive: Predicts future trends based on pipeline operation; normally associated with machine learning(ML)
+	- Prescriptive: Recommends future actions based on predictions
+
+25.5 Troubleshoot failed Spark Jobs
+- Auzre HDInsight: Check status with Ambari dashboard
+- Azure Databricks: Check logs from Compute tab in Web UI
+
+25.6 Troubleshoot Failed Pipeline Runs
+- Azure Data Factory (ADF)
+- Linked Services > Test connection
+- Data flow debug with data preview
+- Read pipeline run error details

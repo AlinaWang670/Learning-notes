@@ -1,0 +1,496 @@
+Linkedin Learning - Complete Guide to Power BI for Data Analysts by Microsoft Press
+
+1. Getting started with Power BI
+
+1.1 Learning objectives
+
+1.2 Understand the data lifecycle
+- General Analytics Flow
+	Acuqire --> Understand --> Doubt --> Transform --> Analyze --> Present
+	(General stages of answering a business question)
+
+1.3 Understand the Power BI environment
+- Power BI High Level Architecture
+[Cloud] Cloud Sources  ---> Power BI service  <---->  Power BI mobile
+               |             |^         |^
+  ----     ---- |   ----    |(Public)   -|(Gateway) ----    ----    ----
+                 |>        |              |
+[On Premise]  Power BI Desktop  <----    Data Sources
+- Power BI End to End Process Flow
+                              Power BI Desktop                                     Power BI Service
+               |----------------------------------------------------------------|--------------|
+Data Sources ---> Power Query Editor ---> Data Modelling ---> Report Canvas -(Publish)--> Workspace
+                  - Transform Data        - Relationships     - Visualizations         - Consumption
+                  - Cleanse Data          - Formatting        - UI and UX              - Sharing
+                  - M Language            - Hierarchies                                - Security
+                                          - DAX formulas                               - Governance
+
+1.4 Understand Power BI Licensing
+- Individual Licencing
+	- Power BI Desktop
+		- Free download
+	- Power BI Service
+		- Your licence as an individual is either
+			Free
+			Pro
+- Workspace
+	- Your workspace is either
+		- Premium capacity
+		- Non-premium capacity
+- Collaborating in workspaces
+	- User with Pro license (designer) -(publish)-> Workspace A to Shared capacity --> Users with pro license (consumers)
+	- User with Pro license (designer) -(publish)-> Workspace B to dedicated capacity --> Users with pro/free license (consumers)
+
+1.5 Understand Power BI release cycles
+- Monthly Update Cadence
+	- Power BI Desktop and Service
+		- https://learn.microsoft.com/en-us/power-bi/fundamentals/....
+	- Power BI Mobile app
+		- https://learn.microsoft.com/en-us/power-bi/fundamentals/....
+
+1.6 Explore data source settings
+- change data file location: [data source settings] --> [refresh preview]
+
+2. Importing and Transforming Data using Power Query Editor
+
+2.1 Power Query Editor overview
+- Transform Data
+- Applied steps
+- Explore data source: [Get Data] from Excel/SQL Server/ Dynamics 365..
+- Possible file locations:
+	- Local
+	- OneDrive for Business
+	- OneDrive - Personal
+	- SharePoint
+- File Data Sources
+	- Excel
+	- Text/CSV
+	- XML
+	- JSON
+	- PDF
+	- Folder
+	- SharePoint folder
+- Query Best Practices
+	- Bring only the data that you need
+	- Remove rows that are not needed
+	- Remove columns that are not needed
+	- Rename columns using meaningful names
+	- Choose appropriate data types for columns
+- Renaming columns Best Practics
+	- Give columns a proper name as soon as possible
+	- Three reasons we rename columns:
+		- Better readability in self-service
+		- Better results in Q&A
+		- Consistency in the data model
+- Data Types:
+	- Date
+	- Time
+	- Date/Time
+	- Decimal number
+	- Fixed decimal number
+	- whole number
+	- Date/Time/Timezone
+	- Duration
+	- Percentage
+	- Binary
+
+2.2 Import United States sales data
+- Get data , text
+- Properities
+- Remove rows
+- Transform -> Use first row at headers -> left click data type
+	double click the column to RENAME
+- filter -> after or equal to...
+- utilize APPLIED STEPS
+- File -> SAVE AS (.pbix)
+
+2.3 Import customer data
+- Get data , text -> Preview
+- Properities -> change name
+- change type, 
+- right click -> replace values
+- Add Column -> Conditional column -> new column name, if .. equal .value. then .output.., else..output.
+- move columns
+- remove columns
+- make sure you happy with the columns' names/types
+- Add column -> Column From Examples -> From Selection -> add column from examples -> type two or threee examples
+
+2.4 import sales territory data
+- GET DATA, Excel, open, click into the sheet, preview
+- rename sheet
+- Home, split columns, By Delimiter, Custom, rename columns
+- make sure you happy with the columns' names/types
+- handle whitespace, Transform, Format, Trim
+- Add column, Extract, Length (check whitespace)
+- Delete Steps
+
+2.5 Import Product data
+- GET DATA, Excel, open, click into the sheet, preview
+- rename sheet
+- data from the table
+- Remove Columns, remove other columns (in case there will be unexpected columns comin gin later)
+	Always go back to add some steps / refresh data when you making changes, the extra columns will not show up
+- columns names/types
+- text filter, does not equal, ***, case sensitive
+- Format, capitalize each word
+- SAVE
+- HOME, Close & Apply --> PowerBI Data
+
+2.6 Import product rollup data
+- Transform data --> Power Query
+- New Source, Text/CSV
+- Transform, Use First Row as Headers
+- Transform, Format; Extract, text after the delimier
+
+2.7 Merge the product and product rollup data
+[Power Query]
+- Home, Combine, Merge Queries, select the table for merging, click the columns, join Kind(left outer), select the columns you need
+- gear sign, bring me back to the merge
+- SAVE, Apply later/Apply to get out power query
+
+2.8 Import the other country sales data
+- treat them in one file as a source
+- Get Data, Folder, folder path, combine and transform
+- Sample file, every files has the same sheets name and columns, same structure, skip files with errors?
+- order date, filter rows, after date
+- Remove column
+- change type date/time to date
+
+2.9 Append sale queries
+- Combine, Append, Append Queries as New, select two tables
+- Data type: decimal number -> fixed decimal number
+
+2.10 Create columns
+- Select two columns, Add Column, Standard, Mupliplication
+
+2.11 Model loading and cleanup
+- Close & Apply, Power BI
+- right click the table, Enable load, Close & Apply, Power BI
+
+2.12 Organize and document Power Query
+- document the process
+- Organize into the group, table space, create new groups, move tables to groups
+Other Queries is the default
+- table, Query Properties, type in descriptions
+- Applies steps, right click each step, Properties, type in description
+- View tap, Query Dependencies, view their relationships
+- Data source settings, change path
+- View tab, advanced editor(end code)
+
+3. Enhancing the data model: The basics
+
+3.1 Navigate the Power BI desktop
+- top: ribben
+- right: many pins
+- left: report view, Data view, Model view
+
+3.2 Understanding Dimensional modeling
+- Data modeling methodology that centers around measuring business processes
+- The BUSINESS PROCESS are known as FACTS
+- and when we measure business processes, we need ways to describe those measurements
+- for this we use DIMENSIONS as report labels and/or filters
+- the combination of Facts and Dimensions is known as a Star Schema or Dimensional Model
+- In the example:
+	- The business process is Sales
+	- the Dimensions are Products, Sales Territories, Order Date
+- Benfits of a Dimensional Model:
+	- Make your data structures easier to navigate, manage, and consumer over time
+	- Easier to layer in more information while keeping model results predicable
+	- Enable consistent analysis across an organization
+	- Power BI is optimized to consume these models
+
+3.3 Create relationships and manage settings
+- Model View, Manage Relationships, New, select tables, select key columns, cardinality, cross filter direction, close
+- Avoid many to many relationship, deduplicating the dimension table
+	- Transform data, go back to power query, Home, Reduce Rows, Remove Rows, Remove Deplicates
+	- come back to the relationship and change to many to one
+- Stardardize the column name first, hold the key and move to the other to build a relationship
+
+3.4 Modify column properties
+- Table view, right data, select column,column tools, data category, 'country'/'city' --> categorize column
+- column 'total sales', column tools, format 'Currency', 'usd', repete to other columns
+- Formating
+- set default, column tools, Summarization, 'Don't summarize'/'sum'
+
+3.5 Create a column group
+- select 'sales territory country', Data groups, select the ungrouped values, rename the groups and members, check 'include other group', rename the groups name
+
+3.6 Create Hierarchy
+- Model view, Product table, right click column 'Product category', create Hierarchy, Rename the name, Hierarchy, choose columns, hidden the subcategory
+
+3.7 Optimize relationship
+- Model view, some relations are built on number/text, 
+- Home, transform data, Combine, merge queries, sale & sale territory, product id/territory key, replace repetting data, close & apply
+- all relationships are based on numbers
+
+3.8 Discuss data model cleanup
+- Model view, select the columns and Hidden columns
+
+4. Enhancing the Data Model - DAX Basics
+
+4.1 Understand DAX
+- What is DAX
+	- Data Analysis Expressions
+	- Modeled after Excal Formula language
+	- Functional Language
+	- Used to encapsulate business logic in your data model
+	- Example:
+		- Calculate a Full name from a First and Last Name
+		- Calculate Gross Margin %
+		- Calculate Year over Year & changes
+- Syntax: Full Name = Customer[FirstName] & " " & Customer[LastName]
+	- First part of the formula is the name of the column or measure that is being created
+	- the name can contain spaces
+	- Followed by an equal sign
+	- This returns that value to the right of the equal sign
+	- Table names are required whenever the column is form a different table than the current table. Table names must be enclosed in single quotation marks if they contain spaces, other special characters or any non-English alphanumeric characters
+
+4.2 Create basic DAX expressions
+- Calculated on a row-by-row basis
+- Creates a new physical column
+- Take up space in the data model
+- Value is calculated at data load time 
+- Typically reside in dimension table to be used as labels on reports and/or slicers
+- Can often be pushed into the Power Query engine
+Line Total Sale = Sales[UnitPrice] * Sales[OrderQuantity]
+- About Measures
+	- An aggreagte of a column
+	- Do not take up space in the model
+	- Value is calculated at run time
+	- Typically reside in fact tables
+	- Belong to the data model
+- Total Sales = SUM(Sales[Line Total Sales])
+- Filter Context
+	- This context is applied by taking all filters that surround a DAX expression and then applying the filters to the expressions to affect its result
+- Some areas where context can be applied or affected
+	- Within a visual
+	- Visual level
+	- Page level
+	- Report (all pages) level
+	- Inside an expression
+	- Visual interactions
+
+4.3 Use logical expressions in DAX
+- Primary Buyer = AND(Customer[Cars Owned] = 0, Customer[Home Owner] = "No")
+- Secondary Buyer = OR(Customer[Cars Owned] = 0, Customer[Home Owner] = "No")
+- New Column, Color category = IF('Product'[Color] IN {"Black", "Blue", "Red"}, "Darker", "Lighter")
+
+4.4 Comprehensive create calculated columns and measures: Part one
+- Line Product Cost = Sales[Order Quantity] * RELATED('Product'[Standard Cost]), formatting
+- table, right click, new column, Line Margin = Sales[Line Total Sales] - Sales[Line Product Cost]
+- Line Margin % = DIVIDE(Sales[Line Margin], Sales[Line Total Sales], 0)
+- visual is taking the sum function, the results is incorrect
+
+4.5 Comprehensive create calculated columns and measures: Part two
+- Create Measure
+- Total Margin = SUM(Sales[Line Margin])
+- Total Margin % = DIVIDE([Total Margin], [Total Sales], 0), formatting
+- I've got the correct value being calculated for total margin. And the reason this one is correct is it is first doing the aggregations to the appropriate level. So it is going through and figure out what my total sales is for the year and what my margin is for the year, and then it's going and doing the division. So it does the aggregations first to the appropriate level, then it goes through and does the division. 
+- building simple measures, using those simple measures and other measures to create more complex measures, and then just keep layering them on top of each other. 
+- The really nice thing about this is this really does promote maintainability in your measures as you're starting to add more and more into the mix. 
+
+4.6 Comprehensive create calculated columns and measures: Part three
+- moving away from reliance on calculated columns
+- SUMX = SUMX(table, sum of the expression)
+- create measure, Total Sales SUMX = SUMX(Sales, Sales[Unit Price] * Sales[Order Quantity])
+
+4.7 Use the Filter function
+- add measure, Count of sales orders line items = countrows (sales), formatting
+- add measure, Count of sales orders = DISTINCTCOUNT (Sales[Sales order number]), formatting
+- Count of Sales Orders Line Item GT 50 = COUNTROWS (FILTER (Sales, Sales[Line Total Sales] > 50 )), formatting
+
+4.8 Use the all function
+- add measure, Count of ALL Sales Orders Line Items = COUNTROWS(ALL(Sales)); Remove all the filters that are afecting the Sales table for this expression
+- add measure, Pct Sales Orders Line Items ALL Time = DIVIDE([Count of Sales Orders Line Items], [Count of ALL Sales Orders Line Items], 0)
+
+5. Enhancing the Data Model: DAX Time Intelligence
+
+5.1 Build a date table
+- Table tools, New table, create calender table:
+Order Date = CALENDAR (Min(Sales[Order Date]), Max(Sales[Order Date])), change column name, data type: Date
+start date, end date
+- Order Date Year = Format('Order Date'[Order Date], "YYY")
+- Order Date Month = Format('Order Date'[Order Date], "MMM")
+- Order Date Month Number = MONTH('Order Date'[Order Date]), Summarization, Don't summarize
+
+5.2 Disable the auto date/time setting
+- it will overinflate the size of your model
+- File, options and setting. current file, date load, Time intelligence, check Auto date/time
+
+5.3 Design a date table
+- Table view, Table tools, Mark as date table, select a column
+- requirments: unique values, no null values, contiguous date values, if it's a date/Time data type, it has the same timestamp across each value
+
+5.4 Build realtaionship betweem order date and sales
+- connect order date table to sales table
+- follow a star schema + have a date table designated to take advantage of the time intelligent functions
+
+5.5 Basic time intelligence functions
+- YTD Sales = TOTALYTD([Total Sales], 'Order Date'[Order Date]), Order Date table, Sort by column, Order Date Month Number
+- formatting
+- New Measure, QTD Sales = TOTALQTD([Total Sales], 'Order Date'[Order Date]), formatting
+
+5.6 Use the CALCULATE function
+- SUMIF function; evaluates an expression in a context modified by filters.
+- SAles table, new measure, PY Total Sales = CALCULATE([Total Sales], SAMEPERIOFLASTYEAR('Order Date'[Order Date]))
+
+6. Enhancing the Data Model: Quick Measures
+
+6.1 Use Quick Measure
+- Sales table, right click, add quick measure, Calculations, Year-over-year change, Base value - Total Sales, Date - Order Date, Number of periods - 1;
+- daxformatter.com, format the code
+ 
+7. Building Desktop visualizations - the basics
+
+7.1 Navigate the Power Bi Desktop report view
+- report view, build visual/format page, format page, page information/ canvas...
+- Data pane, data
+- Filters
+
+7.2 Create a clustered column chart
+- New Page, named Overview, Add data to your visual, cluster column chart, sales territory continent to the X axis, sales table, total sales to y axis
+- Format your visual, Visual, X-axis, Title, turn off; Y-axis, Range, 0 5,000,000, turn the Title off; Data label on, Options, Orientation- inside end; value, decimal places to 1; General, Properities, Height,  570, Veritical 115; Title, Text "", Bold
+- focus on the visual, click on the 'three dots', Sort axis, Sort on Total Sales, Sort ascending
+
+7.3 Create a stacked bar chart
+- Visualizations pane, Clustered bar chart, move to the right position, Choose visual, select data, Product subcatrgoty to the y axis, total margin % to the x axis. Format, general, position, change title...
+- hover over top of the bar, it shows information or drill dowm. go back to the visual, drag the order quantity to the tooltips, rename the title
+
+7.4 Create a line chart
+- focus the canvas, line chart, drag the size, data, order date table, year- x-axis, total sales y-axis, format visual, x axis on , title off, y axis title off, Markers on; General size, 425, 495, position, Title Sales performance, bold
+
+7.5 Create a KPI visual
+- Data pane, Sale right click new measure, 1 Targer = 7000000; 
+- Visualizations, Build visual, KPI, move the visual, add Total sales to Value, take Order Date Year to Trand axis, Target to Target
+- Formatting, Visual, Callout calue, font: 30 center Millions, Trand axis off, Target label: Distance to goal off; General size, position 20 115; Title: Total sales
+
+7.6 Create a card visual
+- Visualizations, Build visual, Card, drag it to the position, Sales, Target value to Fields; 
+- Formating: Callout calue, font 30, category label, off; general Size, Position; Title: Target, Font bold
+
+7.7 Create slicers
+- Visualizations, Build visual, Slicer, Sales Territory Table, Sales Territory continent to the Field
+- Formatting, Options, Style: Dropdown, Slection, Multi-selection on, Show "Select all" on; Slicer header on, Text font; General Size 70 170, Position 1105 115
+- right click the slicer, copy, Order Date Year; Formatting: Title Year, Position 1105 85
+- Open Filters more sophisticated
+
+Lesson 8: Building Desktop Visualizations - Next Level
+
+8.1 Add a canvas background
+- focus on the canvas, format your report page, Canvas background, Image, browse, choose your pic, Imagine fit: Fit, Transparency 0%
+- Page 2, focus the canvas, Visualization, format, image, transparency, make sure the table fit the frame, change the pages' names
+
+8.2 Apply the theme
+- apply the theme file, focus on the overview report page, VIEW, theme, dropdown, scroll down, browse for themes, github file, the cisual will use the formatting file, 
+
+8.3 Adjust existing visual
+- KPI chart, formatting, Data, hide useless data, space out some columns
+
+8.4 Create a custom tooltip
+- create a new page, name the page, format, page information, Allow ues as tooltip, canvas settings, type, tooltip
+- View Tap, Page view, actual size; click pue chart, Sales territory table, Sales Terroity country to the Legend, Total Sales to Values
+- Formatting, Visual, Legend off, Options, Label All detail labels, Values Display units Millions, Value decimal places 1, Percentage decimal place 1; General Title text, Font; Effects, Background on; save;
+- tooltip is what shown up, chart, General, Tooltips, Type Report page, Page Salse Regions(the custom tooltip); 
+
+8.5 Explore drill through
+- right click, Drill down; focus on the table, get rid of the columns, find the Product Subcatgory in Data, check the data, Visualization, scroll down Drill through, drag the Product category to the "Used as category"
+- Back to overview, make sure no filters on, right click on one of the bar,  click on Drill through, we can see the product info table with the product filter on, and hide the Product info table (right click), so only the Overview and DAX Demon is shown.
+
+8.6 Apply conditional formatting to a visual
+- table page and focus on the table, Format your visual, Visual, Cell elements, Apply setings to Series: "Total Sales YoY%", tuen on Icons, click the Icons, Format style, configure the values; Style presets, Alternating rows; Column headers, Text, font, background; Totals, Values, background; 
+
+8.7 Build an order date hierarchy
+- build a date hierarchy; Model view, Claspse the other table, open the table page, click the table header, we see the Properties, right click the Order Date Year and Create hierarchy, now we have a hierarchy in the table, go down the Propertise, find the Hierarchy, Click Order Date, Year, Month, Day; Hide the columns that are in the hierarchy or those that are not used;
+
+8.8 Enable a drill-down on a visual
+- Overview tab, focus on line chart, get rid of the Order Date Year off the x-axis, drage the Order Date Hierarchy to the x-axis, so that we can set drill-down. the top pane can change the time frame we are looking at.
+
+8.9 Edit interactions between xisuals
+- Slicers, charts all changed, or click on the bar, the date also focus on the north america, 
+- modified how the interation happen, click on the filter Year, on the top click Format, Edit internaction, none for the line chart, turn off the interaction. the visual will be blocked by the filter.
+- we can also choose one chart and choose how the other visuals interact with it, Filter/Highline/Block. Default is Highline
+
+8.10 Use the Selection pane
+- View tab, Filters pane & Selection pane, Selection, Tab order, change the name for the silcers, change the orders
+- Layer order, hide some tab
+
+8.11 Use the Bookmarks pane
+- View tab, enable the Bookmarks & Selection pane, make sure unfilter, Bookmarks Add, rename Sale Home: default stage. 
+- choose Noramerica, Year 2021, line chart to be on month 2021, hide slicers, add bookmarks, rename North America Sales 2021.
+- Bookmarks, View, up and down to see diff pages
+
+8.12 Explore the filter pane
+- dive into the filter pane
+- View, Filters, filters pane, Show or hide the pane for report. save space for the report. Filters on this page or on all pages. we can also format the filters, turn off for the report
+
+8.13 Explore the structure of a .pbix file
+- Sales.pbix break the files into Dataset and Report two files, so that we can create reuseable data and build diff reports
+- each page can contain several visuals
+
+Lesson 9: Using the Power BI Service - Reading View
+
+9.1 Publish to the Power BI Service
+- Cloud  Cloud Sources    Power BI Service    Power BI Mobile
+  On Premise    Power BI Desktop      Data Sources
+- Desktop -- Publish --> Sevice
+- Data Sources --gateway--> Service
+- Published Dataset
+	.pbix publish to the Power BI Service
+	we can build multi reports on top of that and suiface on the dashboard
+- only create reports on dashboard
+- make sure the filters are all off, hide the unused pages, go to the home tab, Publish, select My Workspace, Open '.ppbix' in Power BI / web browser to see the result
+- now we can see the pages in Power BI. click on the My Workspace we can see the dataset and the report
+
+9.2 Explore the Power BI Service
+- Left pane, Home/ Create/ Browse/ Workspace; top. download/ question/ ...
+
+9.3 Create and use Bookmarks
+- Sales report, upper right, add a personal bookmark / show more bookmarks; see the previous bookmarks
+- Bookmarks, Personal bookmarks, add, rename "Australia 2021", save, play around with the filters, Update bookmark "Australia 2021", add more if you want
+- we can also set bookmark default
+
+9.4 Share reports
+- on the top, click Share, select people, ...
+- to see who has premissions, Share, three dots, More options, Manage permissions, see the link to the report
+
+Lesson 10 Using the Power BI Service - Next Level
+
+10.1 Create a new report using an existing dataset
+- My Workspace, choose the dateset, Create a report, Start from scratch, page pop up
+- choose map, data, Sales territory to Location, map built up, drag Product Hierarchy fond the product category to the Legend, Sales table, Total Margin % to Bubble size
+- top right, save rename the report; go back to the workspace, see two reports
+
+10.2 Build a dashboard
+- Dataset, Report,   Dashboard
+           Report 2
+  Dataset, Report 3
+- PowerBi service, workspace, New, New Dashboard, name dashboard
+- Sales Map on the left pane, upper right Pin visual, pin in to existing dashboard, go to the dashboard, 
+- go to Sales report, pin Total Sales card, pin, Sales performance, Pin visual
+- to the dashboard, drag and resize the visuals, resizing base on the gray area, 
+- when you click on the graph, it will bring you to the sourse report
+
+10.3 Configure the dashboard
+- to the dashboard, for the chart, click the ellipses, edit details, Title, subtitle, Functionality, Display last refresh time, Apply
+- top edit tab, mobile layout, rearrange for the mobile, upper right, web layout, for creatting seperate layout
+
+10.4 Set an alert
+- notify you when a data on a dashboard changes above or below limit you set; only you can see the alert
+- on the KPI visual, ellipses, Manage alerts, Add alert rule, title, rule, frequency, Email, Save
+- take a look at the msf power automate
+
+10.5 Use the Q&A dialog
+- on the top of the dashboard, Ask a question about your data, it will create a visual for your answer, you can also define the chart type you like; editting, Visualizations, condigure things, pin visual
+
+Lesson 11: Implementing Security and Access
+
+11.1 create row-level security (RLS) roles
+- Modeling tab, Manage roles, Manage security roles, New, name the role group, select table, filter data, role setup
+- do duplicate/ add more role groups
+
+11.2 Validate RLS roles using Power BI Desktop
+- Modeling, View as, select controller group
+- Home, Publish, select workspace, make sure the report go back to the default stage, Replace this dataset? publish
+
+11.3 Assign and validate roles in the Power BI service
+- Service, My workspace, sales dataset, ellipses, Security, we can see the roles we designed, click on the roles, ellipses, test as role, test other roles as well; or even select the person as our testing view
