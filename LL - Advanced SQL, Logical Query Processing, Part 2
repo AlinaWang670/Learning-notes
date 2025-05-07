@@ -1,0 +1,32 @@
+LL - Advanced SQL, Logical Query Processing, Part 2
+
+Lesson 1: Subqueries and set operators
+
+1.1 Subqueries
+- Table expression / Scalar expression / Row expression
+- Non-correlated / Correlated
+- Correlated: 
+      Select Foo,
+        (Select AVG(Foot)
+          From Bart
+          Where Bart.Foot = Foobar.Foo
+        ) As Bar
+      From FooBar;
+  - be aware of the alias in the subqueries
+- EXITS: happen in correlated tables
+      Select *
+      from Persons AS P
+      Where Exists (
+        Select NULL
+        From Adoptions AS A
+        Where A.Adopter_Email = P.Email
+      );
+
+1.2 Set Operators
+- UNION ALL | DISTINCT
+- EXCEPT ALL | DISTINCT
+- INTERSECT ALL | DISTINCT
+- set operators stand between two different queries
+- Set Operators vs. Joins
+  - Join combine two tables expressions horizontally. The result rows depend on the type of Join, but may contain attributes from one or both sources. 
+  
