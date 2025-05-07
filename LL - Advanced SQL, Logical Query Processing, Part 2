@@ -28,5 +28,9 @@ Lesson 1: Subqueries and set operators
 - INTERSECT ALL | DISTINCT
 - set operators stand between two different queries
 - Set Operators vs. Joins
-  - Join combine two tables expressions horizontally. The result rows depend on the type of Join, but may contain attributes from one or both sources. 
+  - Join combine two tables expressions horizontally. The result rows depend on the type of Join, but may contain attributes from one or both sources.
+  - Set operators combine two table expressions vertically. The result consists of the matching attributes from both sets, and typically these are the same attributes.
+- Intersect/ intersect distinct
+- Except; except all
+
   
