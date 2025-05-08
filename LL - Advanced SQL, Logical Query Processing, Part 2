@@ -32,5 +32,13 @@ Lesson 1: Subqueries and set operators
   - Set operators combine two table expressions vertically. The result consists of the matching attributes from both sets, and typically these are the same attributes.
 - Intersect/ intersect distinct
 - Except; except all
+- not exists
 
-  
+Lesson 2: Advanced joins
+
+2.1 Self and inequality joins
+- Self joins: use table at from 
+- Non-Equality Joins
+      - Bule INNER JOIN Organge
+            ON Blue.Value > Orange.Value
+      - Every join begins with a Cartesian product (every element from table A is matched with every element from the table B)
