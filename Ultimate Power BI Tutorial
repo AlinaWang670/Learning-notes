@@ -1,0 +1,52 @@
+https://www.youtube.com/watch?v=Dk25lwdTKow&t=1862s
+
+Tips for building good Power BI
+1. Performance optimization - structured data model - star/snowfakes schemes
+2. strong data model - accuracy / precise
+3. scalability - continue to develop
+4. maintenance reasons
+5. Enhanced usability - is this user friendly
+
+Power query editor - Transform data
+
+- data sum/average
+
+- hierarchy
+- put fields in folders
+- DAX 
+  - Reading Score = AVERAGE('Test Scores'[Reading Score])
+  - Quick measures
+- Framing your report to convey a certain message 
+  - Three/Four questions essential to the data
+  - What is one trend you want to convey
+  - main body: three four metrics, theme will help
+  - exclude columns - filter out
+  - Visual left panel, Add or remove visual elements, more options, Data labels/Gridlines/Options
+  - Visual left panel, Add or remove visual elements, more options, Detail, data / background
+  - Apply theme, View tab, Theme, expand, customize theme, Name and color / Text / Visuals, background, border on, Radius(rounded) / Page
+  - Save theme, json file; browse the themes
+  - Format pane on the right, Walpaper, Image / Canvas background, Image
+  - Insert, image, drag and drop; Text box, texting
+  - Insert web: Format image, Action on, Type Web URL
+  - Format text box, Background, Transparency, Format painter, copy paste
+  - Format, Background, Color, Fx -> conditional formatting, Values, right click, Conditional formatting, background color, minimum|Center|Maximum
+  - Build, Get more visuals, text filter, bring in the visual, Field,
+- AI Q&A
+  - Build, Q + A, type in the questions, submit, turn into a visual
+  - "Show me reading score average by state as a map"
+- Tool page
+  - Format, page type, tooltip, treemap(> pie chart), math sum to value; Format, title off; Page information, Show tooltip on, drag [District] and drop, and you will be able to see it when view district data
+- Copilot
+  - add a new page / suggestions
+- Publishing and sharing
+  - Publish, save, on the first page you want to see.
+  - Publish a semantic model; reports & data
+  - Power BI Pro / Power BI Premium
+  - select the workspace, publishing to Power BI, link to get to the workspace / get quick insight, Pin, add it to dashboard
+  - HOME, all the resent reports/workspaces/ New Report / Create / Workspace
+  - Workspace, find the workspace, open the report, File, Download; Export, Powerpoint/excel; Share, Send link
+  - Refresh frequency, add time, 
+
+
+
+
